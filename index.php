@@ -1,5 +1,5 @@
 <?php
-include './classes/Api.class.php';
+include './classes/Post.class.php';
 
 echo '
 <style>
@@ -19,9 +19,9 @@ echo '
 	}
 </style>
 <H1>Посты</H1>';
-
-$api = new Api("https://jsonplaceholder.typicode.com/");
-$json = $api->getPosts();
+$url = 'https://jsonplaceholder.typicode.com/';
+$post = new Post($url);
+$json = $post->getPosts();
 $posts = json_decode($json);
 echo '<div class="posts">';
 
