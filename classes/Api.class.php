@@ -1,5 +1,5 @@
 <?php
-include '../classes/ErrorHandler.class.php';
+include './classes/ErrorHandler.class.php';
 class Api
 {
 	private $apiURL;
@@ -20,18 +20,40 @@ class Api
 					CURLOPT_POSTFIELDS => $data
 				]);
 				break;
-
+			case 'PATCH':
+				curl_setopt_array($curl, [
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+					CURLOPT_CUSTOMREQUEST => "PATCH",
+					CURLOPT_POSTFIELDS => $data
+				]);
+				break;
+			case 'DELETE':
+				curl_setopt_array($curl, [
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+					CURLOPT_CUSTOMREQUEST => "DELETE",
+				]);
+				break;
 			default:
 
 				break;
 		}
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		$response = curl_exec($curl);
+
+
+		$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		if ($code > 220) {
+			$response = ErrorHandler::JSONResponse(500, "The requst wasn't succesful.");
+		}
+
+
 		curl_close($curl);
 		return $response;
 
 	}
-	private function getData($endpoint)
+	private function GETrequest($endpoint)
 	{
 		$response = $this->curlRequest("GET", $endpoint);
 		if (!$response) {
@@ -40,31 +62,40 @@ class Api
 		return $response;
 
 	}
-	private function postData($endpoint, $data)
+	private function POSTrequest($endpoint, $data)
 	{
 		$response = $this->curlRequest("POST", $endpoint, $data);
 		return $response;
 	}
+	private function PATCHrequest($endpoint, $data)
+	{
+		$response = $this->curlRequest("PATCH", $endpoint, $data);
+		return $response;
+	}
+	private function DELETErequest($endpoint)
+	{
+		return $this->curlRequest("DELETE", $endpoint);
+	}
 	public function getUsers()
 	{
-		return $this->getData('users/');
+		return $this->GETrequest('users/');
 	}
 	public function getUser(int $id)
 	{
-		return $this->getData('users/' . $id);
+		return $this->GETrequest('users/' . $id);
 	}
 	public function getPosts($userId = null)
 	{
 		if (is_null($userId)) {
 			// Получение всех постов
-			return $this->getData('posts/');
+			return $this->GETrequest('posts/');
 		}
 		// Получение постов пользователя
-		return $this->getData('users/' . $userId . '/posts/');
+		return $this->GETrequest('users/' . $userId . '/posts/');
 	}
 	public function getPost($id)
 	{
-		return $this->getData('posts/' . $id);
+		return $this->GETrequest('posts/' . $id);
 	}
 
 	public function getTodos($userId = null)
@@ -72,16 +103,16 @@ class Api
 		$response = null;
 		if (is_null($userId)) {
 			// Получение всех заданий
-			$response = $this->getData('todos/');
+			$response = $this->GETrequest('todos/');
 		} else {
 			// Получение заданий определенного пользователя
-			$response = $this->getData('users/' . $userId . '/todos');
+			$response = $this->GETrequest('users/' . $userId . '/todos');
 		}
 		return $response;
 	}
 	public function getTodo($id)
 	{
-		return $this->getData('todos/' . $id);
+		return $this->GETrequest('todos/' . $id);
 	}
 
 	public function addPost($userId = null, $title = null, $body = null)
@@ -98,10 +129,30 @@ class Api
 			$data['body'] = $body;
 		}
 
-		return $this->postData(
+		return $this->POSTrequest(
 			'posts/',
 			json_encode($data)
 		);
+	}
+
+	public function changePost($postId, $userId = null, $title = null, $body = null)
+	{
+		$data = [];
+		if ($userId !== null) {
+			$data['userId'] = $userId;
+		}
+
+		if ($title !== null) {
+			$data['title'] = $title;
+		}
+		if ($body !== null) {
+			$data['body'] = $body;
+		}
+		return $this->PATCHrequest('posts/' . $postId, json_encode($data));
+	}
+	public function deletePost($postId)
+	{
+		return $this->DELETErequest('posts/' . $postId);
 	}
 
 }
