@@ -20,13 +20,15 @@ class Request
 
 		curl_setopt($this->curl, CURLOPT_URL, $this->apiURL . $endpoint);
 		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        if ($data){
-            $data = json_encode($data);
-        }
+		curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+		if ($data) {
+			$data = json_encode($data);
+		}
+
 		switch ($method) {
 
-            case self::POST:
+			case self::POST:
 				curl_setopt($this->curl, CURLOPT_POST, true);
 				curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
 
@@ -40,8 +42,8 @@ class Request
 				curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
 				break;
 
-            case self::GET:
-            default:
+			case self::GET:
+			default:
 				break;
 		}
 		$response = curl_exec($this->curl);
