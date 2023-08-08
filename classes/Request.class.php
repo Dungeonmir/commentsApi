@@ -46,7 +46,7 @@ class Request
 
 		$code = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
 		if ($code > 220) {
-			$response = ErrorHandler::JSONResponse(500, "The requst wasn't succesful.");
+			$response = die("Problems on the server");
 		}
 		return $response;
 
