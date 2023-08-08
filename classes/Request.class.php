@@ -1,5 +1,4 @@
 <?php
-include './classes/ErrorHandler.class.php';
 class Request
 {
 	private $apiURL;
@@ -14,23 +13,21 @@ class Request
 		$this->apiURL = $URL;
 		$this->curl = curl_init();
 	}
-	private function curlRequest($method, $endpoint, $data = null)
+	public function execute($method, $endpoint, $data = null)
 	{
 
 		curl_reset($this->curl);
 
 		curl_setopt($this->curl, CURLOPT_URL, $this->apiURL . $endpoint);
 		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
-
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 
 		switch ($method) {
 
-			case self::GET:
-				break;
-
-			case self::POST:
+            case self::POST:
 				curl_setopt($this->curl, CURLOPT_POST, true);
 				curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
+
 				break;
 			case self::PATCH:
 				curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
@@ -41,7 +38,8 @@ class Request
 				curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
 				break;
 
-			default:
+            case self::GET:
+            default:
 				break;
 		}
 		$response = curl_exec($this->curl);
@@ -52,28 +50,5 @@ class Request
 		}
 		return $response;
 
-	}
-	public function GETrequest($endpoint)
-	{
-		$response = $this->curlRequest($this::GET, $endpoint);
-		if (!$response) {
-			return ErrorHandler::JSONResponse(404, 'Resource not found');
-		}
-		return $response;
-
-	}
-	public function POSTrequest($endpoint, $data)
-	{
-		$response = $this->curlRequest($this::POST, $endpoint, $data);
-		return $response;
-	}
-	public function PATCHrequest($endpoint, $data)
-	{
-		$response = $this->curlRequest($this::PATCH, $endpoint, $data);
-		return $response;
-	}
-	public function DELETErequest($endpoint)
-	{
-		return $this->curlRequest($this::DELETE, $endpoint);
 	}
 }
