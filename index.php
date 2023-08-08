@@ -6,9 +6,9 @@ spl_autoload_register(function ($class) {
 
 $request = new Request('https://jsonplaceholder.typicode.com/');
 $json = $request->execute($request::GET, 'comments');
-$json = json_decode($json, true);
+$decode = json_decode($json, true);
 
-$postIdArray =  array_column($json, 'postId');
+$postIdArray =  array_column($decode, 'postId');
 
 function countPosts($postIdArray): int
 {
@@ -25,11 +25,8 @@ function countMaxComment($postIdArray){
     return array_shift($arrayCountValues);
 }
 
-echo 'countPosts '.countPosts($postIdArray);
-echo 'maxCommentPosId '. maxCommentPostId($postIdArray);
-echo 'countMaxComment '. countMaxComment($postIdArray);
-
 $response = new Request('https://webhook.site/6001d3b2-e104-4abe-a23f-cc7febb88979');
+
 $response->execute($response::POST, '', [
     'postsCount'=>countPosts($postIdArray),
     'maxCommentPostId'=>maxCommentPostId($postIdArray),
