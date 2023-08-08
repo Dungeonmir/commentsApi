@@ -13,6 +13,10 @@ class Request
 		$this->apiURL = $URL;
 		$this->curl = curl_init();
 	}
+	function __destruct()
+	{
+		curl_close($this->curl);
+	}
 	public function execute($method, $endpoint, $data = null)
 	{
 
