@@ -46,7 +46,7 @@ class Request
 
 		$code = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
 		if ($code > 220) {
-			$response = die("Problems on the server");
+			die("Problems on the server. Error code $code");
 		}
 		return $response;
 
