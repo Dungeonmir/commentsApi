@@ -24,7 +24,6 @@ function countMaxComment($postIdArray){
     arsort($arrayCountValues);
     return array_shift($arrayCountValues);
 }
-
 $response = new Request('https://webhook.site/6001d3b2-e104-4abe-a23f-cc7febb88979');
 
 $response->execute($response::POST, '', [

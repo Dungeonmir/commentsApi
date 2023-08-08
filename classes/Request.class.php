@@ -21,7 +21,9 @@ class Request
 		curl_setopt($this->curl, CURLOPT_URL, $this->apiURL . $endpoint);
 		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-
+        if ($data){
+            $data = json_encode($data);
+        }
 		switch ($method) {
 
             case self::POST:
